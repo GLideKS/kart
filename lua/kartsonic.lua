@@ -1,4 +1,4 @@
---romoney5: "kart remix"
+--romoney5: "kart RMX" as suggested by marilyn
 
 rawset(_G,"gamespeed",1) --(gamespeed+1)*50 cc, or gear gamespeed+1
 rawset(_G,"franticitems",0)
