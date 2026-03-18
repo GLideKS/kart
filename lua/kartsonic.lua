@@ -1925,6 +1925,7 @@ end
 COM_AddCommand("kart_restat",kart_restat)
 
 local BT_DRIFT = BT_SPIN--|BT_CUSTOM3
+local BT_STOMP = BT_CUSTOM1
 
 local function anim(player)
 	local mo = player.mo
@@ -2250,6 +2251,25 @@ addHook("PlayerThink",function(player)
 						break
 					end
 				end
+			end
+			
+			if not P_IsObjectOnGround(mo) then
+				if not mo.kart_stomping
+				and (player.kmd.buttons & BT_STOMP) and not (player.klastbuttons & BT_STOMP) then
+					mo.momz = $ * P_MobjFlip(mo)
+					mo.momz = min($, -mo.scale * 16)
+					mo.momz = $ * P_MobjFlip(mo)
+					
+					mo.kart_stomping = true
+				end
+				
+				if mo.kart_stomping then
+					mo.momz = $ * P_MobjFlip(mo)
+					mo.momz = $ - mo.scale * 2
+					mo.momz = $ * P_MobjFlip(mo)
+				end
+			else
+				mo.kart_stomping = nil
 			end
 			
 			player.lookback = ($ or 1) - 1
