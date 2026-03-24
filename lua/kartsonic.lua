@@ -3772,3 +3772,16 @@ addHook("TouchSpecial",function(special,mo)
 		return true
 	end
 end,MT_STARPOST2)
+
+--player setup fix; this is here because of the data table
+
+--[[hud.add(function(v, player, x, y, scale, skin, sprite2, frame, rotation, color, time, paused)
+	local dat = data[skin]
+	--print(skin, dat)
+
+	if dat and not skins[skin].sprites[SPR2_WALK].numframes then
+		v.drawScaled(x, y, scale, v.getSprite2Patch(skin, dat.spr2, false, A, 5, 0), 0, v.getColormap(skin, color))
+		
+		return true
+	end
+end, "playersetup")]]
