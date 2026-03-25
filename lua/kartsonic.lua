@@ -897,7 +897,7 @@ local function K_KartMoveAnimation(player,t,pain)
 	mo.spriteyoffset = 0
 	// Standing frames - S_KART_STND1   S_KART_STND1_L   S_KART_STND1_R
 	if player.kartdead or pain
-		mo.frame = R
+		mo.frame = Q
 		if t == DAT_TAKISKART mo.frame = J end
 		if t == DAT_TAKISKART_L mo.frame = Q end
 	elseif (player.speed == 0)
