@@ -1425,7 +1425,7 @@ local function UpdateItem(player,onground)
 						player.kartstuff[k_invincibilitytimer] = itemtime+(2*TICRATE); // 10 seconds
 					end
 					P_RestoreMusic(player);
-					S_ChangeMusic("kinvnc",true)
+					S_ChangeMusic("kinvnc", true, player)
 					if (player ~= displayplayer)
 						S_StartSound(player.mo, (kart_invinsfx.value and sfx_alarmi or sfx_kinvnc));
 					end
@@ -1607,7 +1607,7 @@ local function UpdateItem(player,onground)
 							player.kartstuff[k_growshrinktimer] = itemtime+(4*TICRATE); // 12 seconds
 						end
 						P_RestoreMusic(player);
-						S_ChangeMusic("kgrow",true)
+						S_ChangeMusic("kgrow", true, player)
 						if (player ~= displayplayer)
 							S_StartSound(player.mo, (kart_invinsfx.value and sfx_alarmg or sfx_kgrow));
 						end
