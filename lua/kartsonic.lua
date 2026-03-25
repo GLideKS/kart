@@ -133,7 +133,7 @@ freeslot("SPR2_KART", "SPR2_PLAY",
 "S_BUMP1", "S_BUMP2", "S_BUMP3",
 "S_DRIFTDUST1", "S_DRIFTDUST2", "S_DRIFTDUST3", "S_DRIFTDUST4",
 "S_DRIFTSPARK_A1", "S_DRIFTSPARK_A2", "S_DRIFTSPARK_A3", "S_DRIFTSPARK_B1", "S_DRIFTSPARK_C1", "S_DRIFTSPARK_C2",
-"SPR_FAST","S_FASTLINE1","S_FASTLINE2","S_FASTLINE3","S_FASTLINE4","S_FASTLINE5",
+"S_FASTLINE1","S_FASTLINE2","S_FASTLINE3","S_FASTLINE4","S_FASTLINE5",
 "SPR_DSHR","S_FASTDUST1",
 "SPR_WIPD","S_WIPEOUTTRAIL1",
 
@@ -161,6 +161,8 @@ for i = 1,8
 end
 freeslot("sfx_itrolf", "sfx_itrole", "sfx_itrolm", "sfx_dbgsal")
 
+freeslot("SPR_KART_SOAP_SPEEDLINE")
+
 states[S_KARTAIZDRIFTSTRAT] = {SPR_AIDU, FF_ANIMATE|FF_PAPERSPRITE, 5*2, nil, 5, 2, S_NULL}
 
 states[S_DRIFTDUST1] = {sprite = SPR_KDST, frame = 0, tics = 3, action = nil, var1 = 0, var2 = 0, nextstate = S_DRIFTDUST2}
@@ -168,11 +170,12 @@ states[S_DRIFTDUST2] = {sprite = SPR_KDST, frame = 1, tics = 3, action = nil, va
 states[S_DRIFTDUST3] = {sprite = SPR_KDST, frame = FF_TRANS20|2, tics = 3, action = nil, var1 = 0, var2 = 0, nextstate = S_DRIFTDUST4}
 states[S_DRIFTDUST4] = {sprite = SPR_KDST, frame = FF_TRANS20|3, tics = 3, action = nil, var1 = 0, var2 = 0, nextstate = S_NULL}
 
-states[S_FASTLINE1] = {sprite = SPR_FAST, frame = FF_PAPERSPRITE|FF_FULLBRIGHT, tics = 1, action = nil, var1 = 0, var2 = 0, nextstate = S_FASTLINE2}
-states[S_FASTLINE2] = {sprite = SPR_FAST, frame = FF_PAPERSPRITE|FF_FULLBRIGHT|1, tics = 1, action = nil, var1 = 0, var2 = 0, nextstate = S_FASTLINE3}
-states[S_FASTLINE3] = {sprite = SPR_FAST, frame = FF_PAPERSPRITE|FF_FULLBRIGHT|2, tics = 1, action = nil, var1 = 0, var2 = 0, nextstate = S_FASTLINE4}
-states[S_FASTLINE4] = {sprite = SPR_FAST, frame = FF_PAPERSPRITE|FF_FULLBRIGHT|3, tics = 1, action = nil, var1 = 0, var2 = 0, nextstate = S_FASTLINE5}
-states[S_FASTLINE5] = {sprite = SPR_FAST, frame = FF_PAPERSPRITE|FF_FULLBRIGHT|4, tics = 1, action = nil, var1 = 0, var2 = 0, nextstate = S_NULL}
+-- states[S_FASTLINE1] = {sprite = SPR_FAST, frame = FF_PAPERSPRITE|FF_FULLBRIGHT, tics = 1, action = nil, var1 = 0, var2 = 0, nextstate = S_FASTLINE2}
+-- states[S_FASTLINE2] = {sprite = SPR_FAST, frame = FF_PAPERSPRITE|FF_FULLBRIGHT|1, tics = 1, action = nil, var1 = 0, var2 = 0, nextstate = S_FASTLINE3}
+-- states[S_FASTLINE3] = {sprite = SPR_FAST, frame = FF_PAPERSPRITE|FF_FULLBRIGHT|2, tics = 1, action = nil, var1 = 0, var2 = 0, nextstate = S_FASTLINE4}
+-- states[S_FASTLINE4] = {sprite = SPR_FAST, frame = FF_PAPERSPRITE|FF_FULLBRIGHT|3, tics = 1, action = nil, var1 = 0, var2 = 0, nextstate = S_FASTLINE5}
+-- states[S_FASTLINE5] = {sprite = SPR_FAST, frame = FF_PAPERSPRITE|FF_FULLBRIGHT|4, tics = 1, action = nil, var1 = 0, var2 = 0, nextstate = S_NULL}
+states[S_FASTLINE1] = {sprite = SPR_KART_SOAP_SPEEDLINE, frame = FF_PAPERSPRITE|FF_FULLBRIGHT, tics = 5, action = nil, var1 = 0, var2 = 0, nextstate = S_NULL}
 
 -- states[S_DRIFTSPARK_A1] = {SPR_DRIF, FF_FULLBRIGHT|2, 2, nil, 0, 0, S_DRIFTSPARK_A2}
 states[S_DRIFTSPARK_A1] = {SPR_DRIF, FF_FULLBRIGHT|2, 2, nil, 0, 0, S_DRIFTSPARK_A2}
@@ -2405,6 +2408,8 @@ addHook("PlayerThink",function(player)
 					mo.z + (mo.height/2) + (P_RandomRange(-20,20) * mo.scale),
 					MT_THOK);--FASTLINE);
 				fast.state = S_FASTLINE1
+-- 				fast.color = SKINCOLOR_BLUEBELL
+				fast.color = mo.color --colored linespeeds!!
 				fast.scale = mapobjectscale
 				fast.angle = R_PointToAngle2(0, 0, mo.momx, mo.momy);
 				fast.momx = 3*mo.momx/4;
