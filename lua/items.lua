@@ -15,8 +15,12 @@ addHook("NetVars",function(net)
 	spbplace = net($)
 end)
 
-freeslot("SPR_BOST", "S_BOOSTFLAME", "S_BOOSTSMOKESPAWNER", "MT_BOOSTFLAME", "SPR_KFRE", "S_KARTFIRE1", "S_KARTFIRE2")
-states[S_BOOSTFLAME] = {SPR_BOST, FF_FULLBRIGHT|FF_ANIMATE, TICRATE, nil, 6, 1, S_BOOSTSMOKESPAWNER}
+--nicolas efectos
+
+freeslot("SPR_KART_NICK_WOOSH")
+
+freeslot("S_BOOSTFLAME", "S_BOOSTSMOKESPAWNER", "MT_BOOSTFLAME", "SPR_KFRE", "S_KARTFIRE1", "S_KARTFIRE2")
+states[S_BOOSTFLAME] = {SPR_KART_NICK_WOOSH or SPR_BOST, FF_FULLBRIGHT|FF_ANIMATE, TICRATE, nil, 3 or 6, 2 or 1, S_BOOSTSMOKESPAWNER}
 states[S_BOOSTSMOKESPAWNER] = {SPR_NULL, 0, TICRATE/2, nil, 0, 0, S_NULL}
 
 states[S_KARTFIRE1] = {SPR_NULL, 0, 10, nil, 0, 0, S_KARTFIRE2}
@@ -28,7 +32,7 @@ mobjinfo[MT_BOOSTFLAME] = {
 	speed = 8,
 	radius = 32*FU,
 	height = 64*FU,
-	displayoffset = 1,
+	displayoffset = -5,
 	mass = 100,
 	flags = MF_NOBLOCKMAP|MF_NOCLIP|MF_NOCLIPHEIGHT|MF_NOGRAVITY,
 }
@@ -2137,7 +2141,9 @@ addHook("MobjThinker",function(mo)
 		end
 		
 		mo.angle = mo.target.angle
-		P_MoveOrigin(mo,mo.target.x+P_ReturnThrustX(nil,mo.angle+ANGLE_180,mo.target.radius),mo.target.y+P_ReturnThrustY(nil,mo.angle+ANGLE_180,mo.target.radius),mo.target.z)
+		mo.dispoffset = -1
+-- 		P_MoveOrigin(mo,mo.target.x+P_ReturnThrustX(nil,mo.angle+ANGLE_180,mo.target.radius),mo.target.y+P_ReturnThrustY(nil,mo.angle+ANGLE_180,mo.target.radius),mo.target.z)
+		P_MoveOrigin(mo,mo.target.x,mo.target.y,mo.target.z)
 		mo.scale = mo.target.scale
 		
 		local player
