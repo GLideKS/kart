@@ -27,6 +27,8 @@ rawset(_G,"kart_debuggeneral", CV_RegisterVar{name = "kart_debug", defaultvalue 
 rawset(_G,"kart_haste", CV_RegisterVar{name = "kart_haste", defaultvalue = "On", PossibleValue = CV_OnOff, flags = CV_NETVAR})
 rawset(_G,"kart_retrocore", CV_RegisterVar{name = "kart_retrocore", defaultvalue = "Off", PossibleValue = CV_OnOff, flags = CV_NETVAR})
 
+rawset(_G,"kart_jumping", CV_RegisterVar{name = "kart_jumping", defaultvalue = "On", PossibleValue = CV_OnOff, flags = CV_NETVAR})
+
 local DAT_STAND = 0 --base sprites
 local DAT_SRB2KART = 1 --regular srb2kart
 local DAT_RINGRACERS = 2 --ring racers character
@@ -160,6 +162,7 @@ for i = 1,8
 	freeslot(st..i)
 end
 freeslot("sfx_itrolf", "sfx_itrole", "sfx_itrolm", "sfx_dbgsal")
+freeslot("sfx_krjump", "sfx_krstmp", "sfx_krstln")
 
 freeslot("SPR_KART_SOAP_SPEEDLINE")
 
@@ -2309,7 +2312,7 @@ addHook("PlayerThink",function(player)
 				end
 			end
 			
-			if not P_IsObjectOnGround(mo) then
+			if not P_IsObjectOnGround(mo) and not P_IsObjectInGoop(mo) then
 				if not mo.kart_stomping
 				and (player.kmd.buttons & BT_STOMP) and not (player.klastbuttons & BT_STOMP) then
 					mo.momz = $ * P_MobjFlip(mo)
@@ -2317,6 +2320,7 @@ addHook("PlayerThink",function(player)
 					mo.momz = $ * P_MobjFlip(mo)
 					
 					mo.kart_stomping = true
+					S_StartSound(mo, sfx_krstmp)
 				end
 				
 				if mo.kart_stomping then
@@ -2325,7 +2329,73 @@ addHook("PlayerThink",function(player)
 					mo.momz = $ * P_MobjFlip(mo)
 				end
 			else
+				if mo.kart_stomping then
+-- 					S_StopSoundByID(mo, sfx_krstmp)
+					S_StartSound(mo, sfx_krstln)
+				end
+				
 				mo.kart_stomping = nil
+				
+				if kart_jumping.value and (player.kmd.buttons & BT_JUMP) and not (player.klastbuttons & BT_JUMP)
+				and abs(player.kartstuff[k_drift]) < 5 then --NO FUN ALLOWED.. . . .. . . .. . .
+					S_StartSound(mo, sfx_krjump)
+					
+					P_SetObjectMomZ(mo, FU * 16)
+					mo.z = $ + P_MobjFlip(mo)
+					mo.state = S_PLAY_JUMP
+					
+					mo.kart_jumping = 1
+				end
+			end
+			
+			mo.spritexscale, mo.spriteyscale = FU, FU
+			if not P_IsObjectOnGround(mo) then
+				if mo.kart_jumping then
+					if mo.kart_jumping == 1 and mo.momz * P_MobjFlip(mo) > mo.scale * 4 then
+						P_SetObjectMomZ(mo, -FU / 2, true)
+					else
+						mo.kart_jumping = 2
+					end
+				end
+				
+				local stretch = FixedDiv(mo.momz * P_MobjFlip(mo), mo.scale) * 3 / 2
+				
+				mo.kart_land_anim_queue = abs(stretch)
+				mo.kart_land_hold = 2 + min((mo.kart_land_anim or 0) / FU / 8, 3)
+				
+				if stretch < 0
+					stretch = -$ / 2
+				end
+				
+				if mo.eflags & MFE_UNDERWATER then
+					stretch = $ / 2 * 3
+				end
+				
+				stretch = ease.inoutsine(min(max($ / 20, 0), FU), 0, FU/3)
+				
+				mo.spritexscale, mo.spriteyscale = $ - stretch, $ + stretch
+			else
+				mo.kart_jumping = false
+				
+				if P_IsObjectOnGround(mo) and mo.kart_land_anim_queue
+					mo.kart_land_anim = mo.kart_land_anim_queue
+					mo.kart_land_anim_queue = 0
+					
+					S_StartSound(mo, sfx_s3k4c)
+				end
+				
+				mo.kart_land_anim = min($ or 0, FU*16)
+				
+				if not mo.kart_land_hold or not P_IsObjectOnGround(mo)
+					mo.kart_land_anim = max($ - (P_IsObjectOnGround(mo) and FU*3/2 or FU*2), 0)
+				else
+					mo.kart_land_hold = $ - 1
+				end
+				
+				local land = mo.kart_land_anim
+				land = ease.insine(min(max($ / 16, 0), FU), 0, FU / 3)
+				
+				mo.spritexscale, mo.spriteyscale = $ + land, $ - land
 			end
 			
 			player.lookback = ($ or 1) - 1
@@ -2394,7 +2464,7 @@ addHook("PlayerThink",function(player)
 			
 			player.drawangle = player.frameangle
 			
-			if player.powers[pw_justlaunched] and mo.momz*P_MobjFlip(mo) > 0 --higher slope launches
+			if player.powers[pw_justlaunched] and not mo.kart_jumping and mo.momz*P_MobjFlip(mo) > 0 --higher slope launches
 				mo.momz = $ * 2
 			end
 			

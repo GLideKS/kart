@@ -88,6 +88,8 @@ local defaults = {
 	
 	aimup = {"LookUp", BT_CAMLEFT},
 	aimdown = {"LookDown", BT_CAMRIGHT},
+	
+	jump = {"Jump", BT_JUMP},
 }
 
 local vars = {}
@@ -790,4 +792,25 @@ addHook("PostThinkFrame",do
 --			local vy = mo.y + shifty + fixmul(sin(angle),dist)
 --			local f1,f2 = vx-x,vy-y
 --			local aiming2 = R_PointToAngle2(0,z,fixhypot(f1,f2),mo.z+P_GetPlayerHeight(player))
---			aiming2 = $ + (aiming < ANGLE_180 and aiming/2 or InvAn
+--			aiming2 = $ + (aiming < ANGLE_180 and aiming/2 or InvAngle(InvAngle(aiming)/2))
+--			aiming2 = G_ClipAimingPitch(aiming2)
+--			aiming = $ + (aiming - aiming2)>>3
+--			if aiming > 0 aiming = $ - ANGLE_45 end
+--			print(aiming2/ANG1,aiming/ANG1)
+--			print(anglefix(aiming)/FU,anglefix(player.aiming)/FU)
+--			aiming = R_PointToAngle2(0,z,fixhypot(f1,f2),mo.z+P_GetPlayerHeight(player))
+--			camobj.angle = ease.linear(cam_speed,angle)
+			player.awayviewaiming = fixangle(camobj.aiming)--ease.linear(cam_speed,G_ClipAimingPitch(aiming))---ANG1*58/10)
+--			print(z/FU)
+--			camobj.momz = FU
+--			cam.z = z
+--			cam.angle = angle
+--			cam.aiming = aiming
+--			cam.radius = 0
+--			cam.height = 0
+		end
+--		camera.angle = angle
+--		camera.aiming = aiming
+--		P_TeleportCameraMove(camera,x,y,z)
+	end
+end)
