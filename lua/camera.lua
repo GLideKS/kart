@@ -71,6 +71,7 @@ local control = {
 	Fire = GC_FIRE, FireNormal = GC_FIRENORMAL,
 	TossFlag = GC_TOSSFLAG,
 	LookUp = GC_LOOKUP, LookDown = GC_LOOKDOWN,
+	LookLeft = GC_TURNLEFT, LookRight = GC_TURNRIGHT,
 	WeaponNext = GC_WEAPONNEXT, WeaponPrev = GC_WEAPONPREV,
 -- 	Weapon1 = GC_WEPSLOT1, Weapon2 = GC_WEPSLOT2, Weapon3 = GC_WEPSLOT3,
 -- 	Weapon4 = GC_WEPSLOT4, Weapon5 = GC_WEPSLOT5, Weapon6 = GC_WEPSLOT6,
