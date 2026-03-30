@@ -17,10 +17,11 @@ end)
 
 --nicolas efectos
 
-freeslot("SPR_KART_NICK_WOOSH")
+freeslot("SPR_KART_NICK_WOOSH", "SPR_KART_BOOSTFLAME")
 
-freeslot("S_BOOSTFLAME", "S_BOOSTSMOKESPAWNER", "MT_BOOSTFLAME", "SPR_KFRE", "S_KARTFIRE1", "S_KARTFIRE2")
+freeslot("S_BOOSTFLAME", "S_BOOSTFLAME2", "S_BOOSTSMOKESPAWNER", "MT_BOOSTFLAME", "SPR_KFRE", "S_KARTFIRE1", "S_KARTFIRE2")
 states[S_BOOSTFLAME] = {SPR_KART_NICK_WOOSH or SPR_BOST, FF_FULLBRIGHT|FF_ANIMATE, TICRATE, nil, 3 or 6, 2 or 1, S_BOOSTSMOKESPAWNER}
+states[S_BOOSTFLAME2] = {SPR_KART_BOOSTFLAME, FF_FULLBRIGHT|FF_ANIMATE, TICRATE, nil, 6, 1, S_BOOSTSMOKESPAWNER}
 states[S_BOOSTSMOKESPAWNER] = {SPR_NULL, 0, TICRATE/2, nil, 0, 0, S_NULL}
 
 states[S_KARTFIRE1] = {SPR_NULL, 0, 10, nil, 0, 0, S_KARTFIRE2}
@@ -32,7 +33,6 @@ mobjinfo[MT_BOOSTFLAME] = {
 	speed = 8,
 	radius = 32*FU,
 	height = 64*FU,
-	displayoffset = -5,
 	mass = 100,
 	flags = MF_NOBLOCKMAP|MF_NOCLIP|MF_NOCLIPHEIGHT|MF_NOGRAVITY,
 }
@@ -811,6 +811,17 @@ local function K_DoSneaker(player, type)
 			overlay.destscale = player.mo.scale;
 			P_SetScale(overlay, overlay.destscale);
 			K_FlipFromObject(overlay, player.mo);
+			overlay.dispoffset = -1
+			
+			local overlay = P_SpawnMobj(player.mo.x, player.mo.y, player.mo.z, MT_BOOSTFLAME);
+			overlay.target = player.mo;
+			overlay.destscale = player.mo.scale;
+			P_SetScale(overlay, overlay.destscale);
+			K_FlipFromObject(overlay, player.mo);
+			overlay.dispoffset = 1
+			overlay.state = S_BOOSTFLAME2
+			overlay.colorized = true
+			overlay.color = player.mo.color
 		end
 	end
 
@@ -2141,9 +2152,11 @@ addHook("MobjThinker",function(mo)
 		end
 		
 		mo.angle = mo.target.angle
-		mo.dispoffset = -1
--- 		P_MoveOrigin(mo,mo.target.x+P_ReturnThrustX(nil,mo.angle+ANGLE_180,mo.target.radius),mo.target.y+P_ReturnThrustY(nil,mo.angle+ANGLE_180,mo.target.radius),mo.target.z)
-		P_MoveOrigin(mo,mo.target.x,mo.target.y,mo.target.z)
+		P_MoveOrigin(mo,
+			mo.target.x + P_ReturnThrustX(nil,mo.angle+ANGLE_180,mo.target.radius * mo.dispoffset),
+			mo.target.y + P_ReturnThrustY(nil,mo.angle+ANGLE_180,mo.target.radius * mo.dispoffset),
+			mo.target.z)
+-- 		P_MoveOrigin(mo,mo.target.x,mo.target.y,mo.target.z)
 		mo.scale = mo.target.scale
 		
 		local player
@@ -2154,9 +2167,9 @@ addHook("MobjThinker",function(mo)
 		end
 		
 		if player
-			if player.kartstuff[k_sneakertimer] > mo.movecount
-				mo.state = S_BOOSTFLAME
-			end
+-- 			if player.kartstuff[k_sneakertimer] > mo.movecount
+-- 				mo.state = S_BOOSTFLAME
+-- 			end
 			mo.movecount = player.kartstuff[k_sneakertimer]
 		end
 		
