@@ -437,6 +437,59 @@ local function K_drawKartFreePlay(v,flashtime)
 	V_DrawKartString(v,BASEVIDWIDTH-(LAPS_X+1)-(12*9),LAPS_Y+3,V_SNAPTOBOTTOM|V_SNAPTORIGHT|V_HUDTRANS, "FREE PLAY")
 end
 
+--lujent
+
+local map_bounds = {}
+
+addHook("MapLoad", function()
+	map_bounds.width, map_bounds.height = 0, 0
+	map_bounds.x1, map_bounds.y1 = INT32_MAX, INT32_MAX
+	map_bounds.x2, map_bounds.y2 = INT32_MIN, INT32_MIN
+	
+	for vertex in vertexes.iterate do
+		local x, y = vertex.x / FU, vertex.y / FU
+		
+		map_bounds.x1, map_bounds.y1 = min($, x), min($, y)
+		map_bounds.x2, map_bounds.y2 = max($, x), max($, y)
+	end
+	
+	map_bounds.width, map_bounds.height = map_bounds.x2 - map_bounds.x1, map_bounds.y2 - map_bounds.y1
+end)
+
+local function DrawMinimapChar(v, player, flags, x, y, worldscale, xoffset, yoffset) --i love parameters
+	local mo = player.mo
+	if not (mo and mo.valid) then return end
+	
+	local icon = v.getSprite2Patch(player.skin, SPR2_LIFE, false, A, 0)
+	x = $ + FixedMul(mo.x, worldscale) - FixedMul(xoffset, worldscale)
+	y = $ - (FixedMul(mo.y, worldscale) - FixedMul(yoffset, worldscale))
+-- 	print(worldscale, map_bounds.width)
+	v.drawScaled(x, y, FU / 2, icon, flags, v.getColormap(nil, mo.color))
+end
+
+local function DrawMinimap(v, player, pcol)
+	local minimap = v.cachePatch(G_BuildMapName().."R")
+	local x, y = FU * 210, FU * 60
+	local flags = V_SNAPTORIGHT
+	v.drawScaled(x, y, FU, minimap, V_50TRANS|flags)
+	
+	local worldscale = min(FixedDiv(minimap.width, map_bounds.width), FixedDiv(minimap.height, map_bounds.height))
+	worldscale = FixedMul($, FU - FU / 20)
+	local xoffset = (map_bounds.x1 + map_bounds.width / 2) * FU
+	local yoffset = (map_bounds.y1 + map_bounds.height / 2) * FU
+	x, y = $ + minimap.width * FU / 2, $ + minimap.height * FU / 2
+	
+	for pla in players.iterate do
+		local flags = flags|V_50TRANS
+		if not (pla.kart and pla ~= player) then continue end
+		
+		DrawMinimapChar(v, pla, flags, x, y, worldscale, xoffset, yoffset)
+	end
+	
+	--draw your player on top
+	DrawMinimapChar(v, player, flags, x, y, worldscale, xoffset, yoffset)
+end
+
 local function drawTrueCrop(v,x,y,scw,sch,patch,flags,col,ll,lr,lu,ld)
 -- 	print(ll/FU,lr/FU,lu/FU,ld/FU)
 -- 	sch = $*2/3
@@ -557,6 +610,8 @@ hud.add(function(v,player)
 	
 	K_drawKartTimestamp(v,player.realtime,TIME_X,TIME_Y,gamemap,0,pcol)
 	K_drawKartLaps(v,player,pcol)
+	
+	DrawMinimap(v, player, pcol) --fixes issue #3
 	
 	if kart_debugdistr.value
 		K_drawDistributionDebugger(player,v)
